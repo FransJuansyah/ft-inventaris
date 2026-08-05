@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Dipakai khusus untuk nama institusi (mis. "Fakultas Teknik Universitas
+       Sriwijaya" di halaman login) — sama dengan font yang dipakai di
+       sia-unsri (project referensi lain milik pengguna), disamakan supaya
+       identitas antar sistem terasa satu keluarga. Jangan pakai untuk teks
+       UI biasa. */
+    --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
+
+    /* ------------------------------------------------------------------
+     | Warna netral
+     |
+     | Skala abu-abu tunggal untuk seluruh aplikasi. Flux memakai `zinc`
+     | secara internal, jadi jangan campur dengan `gray`/`slate`/`neutral`
+     | di komponen sendiri — pakai `zinc` supaya konsisten.
+     ------------------------------------------------------------------ */
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    /* ------------------------------------------------------------------
+     | Warna brand — magenta tua khas FT Unsri
+     |
+     | SATU-SATUNYA tempat mengganti warna identitas aplikasi. Sempat
+     | ungu (placeholder), lalu diganti ke magenta ini setelah ada rujukan
+     | warna resmi FT Unsri. Nilai `#8b0f52` (brand-600) adalah
+     | PERKIRAAN VISUAL dari gambar referensi, bukan kode hex pasti dari
+     | file brand resmi — koreksi kalau ada sumber yang lebih akurat.
+     | Biru bawaan Tailwind (tautan & penanda info) dan abu-abu (netral)
+     | tidak berubah. Warna status barang TIDAK ikut warna brand — tetap
+     | hijau/kuning/merah, lihat §3 KondisiBarang.
+     ------------------------------------------------------------------ */
+    --color-brand-50: #fdf1f7;
+    --color-brand-100: #fbdfee;
+    --color-brand-200: #f6bfdd;
+    --color-brand-300: #ec8ec0;
+    --color-brand-400: #dd5a9c;
+    --color-brand-500: #b62d74;
+    --color-brand-600: #8b0f52;
+    --color-brand-700: #6f0940;
+    --color-brand-800: #560733;
+    --color-brand-900: #400526;
+    --color-brand-950: #260316;
+
+    /* ------------------------------------------------------------------
+     | Kondisi barang (lihat App\Enums\KondisiBarang)
+     |
+     | Dipakai untuk aksen non-teks: titik status, garis tepi kartu,
+     | ikon. Untuk badge, pakai <x-ui.status-badge> yang memetakan enum
+     | ke warna bawaan flux:badge.
+     ------------------------------------------------------------------ */
+    --color-kondisi-baik: var(--color-emerald-600);
+    --color-kondisi-rusak-ringan: var(--color-amber-500);
+    --color-kondisi-rusak-berat: var(--color-red-600);
+    --color-kondisi-penghapusan: var(--color-zinc-500);
+}
+
+/* ------------------------------------------------------------------
+ | Biru — tautan & penanda informasi
+ |
+ | Bagian ketiga dari palet (ungu/biru/abu-abu). Tidak perlu token
+ | kustom — pakai `blue-600`/`blue-700` (terang) dan `blue-400` (gelap)
+ | bawaan Tailwind langsung di kelas util (mis. `text-blue-600
+ | dark:text-blue-400`), persis seperti dipakai di mockup arah desain.
+ ------------------------------------------------------------------ */
+
+/* ----------------------------------------------------------------------
+ | Accent Flux
+ |
+ | Flux memakai --color-accent untuk tombol primary, link, dan focus ring.
+ | Dipetakan ke brand supaya seluruh komponen Flux ikut warna brand tanpa
+ | perlu override per komponen.
+ |
+ | Pasangan warna & teks-di-atasnya sama persis dengan mockup arah desain
+ | yang sudah disetujui pengguna (artifact "FT Inventaris — Arah Desain").
+ ---------------------------------------------------------------------- */
+@theme {
+    --color-accent: var(--color-brand-600);
+    --color-accent-content: var(--color-brand-600);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-brand-400);
+        --color-accent-content: var(--color-brand-400);
+        --color-accent-foreground: var(--color-zinc-900);
+    }
+}
+
+@layer base {
+
+    /* Sembunyikan elemen Alpine sampai Alpine siap (dipakai lightbox foto). */
+    [x-cloak] {
+        display: none !important;
+    }
+
+    /*
+     * Bug baku CSS Grid: item grid punya min-width:auto secara default, jadi
+     * kalau ada konten yang "keras" di dalamnya (mis. flux:callout — flex row
+     * berisi teks panjang), seluruh track [grid-area:main] milik Flux ikut
+     * melebar dan halaman meluber ke samping di layar sempit. min-width:0
+     * memaksa item grid mengikuti lebar track-nya, baru kontennya membungkus
+     * normal di dalam.
+     */
+    [data-flux-main] {
+        min-width: 0;
+    }
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-zinc-200, currentColor);
+    }
+
+    /* Target sentuh minimal 44px di layar kecil — staf lapangan memakai
+       aplikasi ini dari HP sambil berdiri. */
+    @media (pointer: coarse) {
+        button,
+        [role='button'],
+        a[href],
+        summary {
+            min-height: 2.25rem;
+        }
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
